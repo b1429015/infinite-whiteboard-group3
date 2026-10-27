@@ -56,7 +56,7 @@
       display: block;
       width: 100vw;
       height: 100vh;
-      background: var(--board-background, #fff);
+      background: #fff;
       touch-action: none;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
@@ -173,9 +173,6 @@
       cursor: pointer;
     }
 
-    label.color-control { display: inline-flex; align-items: center; justify-content: center; }
-    label.color-control input[type="color"] { width: 27px; min-width: 27px; height: 27px; padding: 0; border: 0; }
-
     .swatch-row {
       display: flex;
       align-items: center;
@@ -281,31 +278,6 @@
       box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.08);
     }
 
-    #chatPanel {
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      z-index: 12;
-      width: min(340px, calc(100vw - 32px));
-      height: min(440px, calc(100vh - 120px));
-      display: none;
-      flex-direction: column;
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      overflow: hidden;
-    }
-
-    #chatPanel.open { display: flex; }
-    #chatHeader, #chatForm { display: flex; align-items: center; gap: 8px; padding: 10px; }
-    #chatHeader { justify-content: space-between; border-bottom: 1px solid var(--panel-border); font-weight: 700; }
-    #chatMessages { flex: 1; overflow: auto; padding: 12px; color: var(--muted); font-size: 14px; line-height: 1.5; }
-    #chatMessages p { margin: 0 0 10px; }
-    #chatForm { border-top: 1px solid var(--panel-border); }
-    #chatInput { flex: 1; min-width: 0; height: 38px; padding: 0 10px; border: 1px solid var(--panel-border); border-radius: 7px; }
-
     @media (max-width: 720px) {
       #toolbar {
         top: auto;
@@ -340,9 +312,6 @@
         <button class="icon-button" type="button" data-tool="rect" title="長方形" aria-label="長方形">□</button>
         <button class="icon-button" type="button" data-tool="circle" title="圓形" aria-label="圓形">○</button>
         <button class="icon-button" type="button" data-tool="ellipse" title="橢圓形" aria-label="橢圓形">◯</button>
-        <button class="icon-button" type="button" data-tool="text" title="文字框" aria-label="文字框">T</button>
-        <button class="icon-button" type="button" data-tool="highlighter" title="螢光筆" aria-label="螢光筆">▰</button>
-        <button class="icon-button" type="button" data-tool="marquee" title="矩形框選" aria-label="矩形框選">▧</button>
       </div>
 
       <div class="tool-group" aria-label="筆觸設定">
@@ -359,16 +328,19 @@
           <input id="widthSlider" type="range" min="1" max="60" value="4" aria-label="粗細">
           <span id="widthValue">4px</span>
         </label>
-        <label class="color-control" title="背景顏色" aria-label="背景顏色">▧<input id="backgroundPicker" type="color" value="#ffffff" aria-label="背景顏色"></label>
-        <label class="color-control" title="文字顏色" aria-label="文字顏色">T<input id="textColorPicker" type="color" value="#172033" aria-label="文字顏色"></label>
-        <label class="width-control" title="圖形填色"><input id="fillToggle" type="checkbox" aria-label="啟用圖形填色">填色</label>
         <button class="icon-button active" id="smoothToggleBtn" type="button" title="筆跡平滑" aria-label="筆跡平滑" aria-pressed="true">≈</button>
       </div>
 
+      <div class="tool-group" aria-label="背景與文字顏色">
+        <label class="width-control" title="白板背景顏色">背景
+          <input class="color-control" id="backgroundColorPicker" type="color" value="#ffffff" aria-label="白板背景顏色">
+        </label>
+        <label class="width-control" title="便條文字顏色">文字
+          <input class="color-control" id="stickyTextColorPicker" type="color" value="#172033" aria-label="便條文字顏色">
+        </label>
+      </div>
+
       <div class="tool-group" aria-label="白板操作">
-        <button id="addImageBtn" type="button" title="加入圖片" aria-label="加入圖片">＋圖片</button>
-        <button id="readOnlyBtn" type="button" title="切換唯讀模式" aria-pressed="false">唯讀</button>
-        <button id="chatToggleBtn" type="button" title="開啟 AI 對話框" aria-expanded="false">AI 對話</button>
         <button id="addStickyBtn" type="button" title="加入便條" aria-label="加入便條">＋便條</button>
         <div class="swatch-row" aria-label="便條顏色">
           <button class="color-swatch active" type="button" data-sticky-color="#fef08a" style="--swatch-color: #fef08a" title="淡黃色便條" aria-label="淡黃色便條"></button>
@@ -393,12 +365,6 @@
     <div id="status" role="status" aria-live="polite"></div>
     <textarea id="stickyEditor" aria-label="便條內容"></textarea>
     <input type="file" id="importJsonInput" accept="application/json" hidden>
-    <input type="file" id="imageInput" accept="image/*" hidden>
-    <section id="chatPanel" aria-label="AI 對話框" aria-hidden="true">
-      <header id="chatHeader"><span>AI 對話（尚未連線）</span><button id="chatCloseBtn" type="button" aria-label="關閉對話框">×</button></header>
-      <div id="chatMessages" aria-live="polite"><p>這是獨立對話介面，目前尚未連接 AI。此對話不會讀取或修改白板。</p></div>
-      <form id="chatForm"><input id="chatInput" type="text" placeholder="輸入訊息…" aria-label="輸入訊息"><button type="submit">送出</button></form>
-    </section>
   </main>
 
   <script>
@@ -406,6 +372,8 @@
     const ctx = canvas.getContext("2d");
     const toolbar = document.getElementById("toolbar");
     const colorPicker = document.getElementById("colorPicker");
+    const backgroundColorPicker = document.getElementById("backgroundColorPicker");
+    const stickyTextColorPicker = document.getElementById("stickyTextColorPicker");
     const widthSlider = document.getElementById("widthSlider");
     const widthValue = document.getElementById("widthValue");
     const smoothToggleBtn = document.getElementById("smoothToggleBtn");
@@ -421,16 +389,6 @@
     const importJsonInput = document.getElementById("importJsonInput");
     const statusBox = document.getElementById("status");
     const stickyEditor = document.getElementById("stickyEditor");
-    const backgroundPicker = document.getElementById("backgroundPicker");
-    const textColorPicker = document.getElementById("textColorPicker");
-    const fillToggle = document.getElementById("fillToggle");
-    const imageInput = document.getElementById("imageInput");
-    const addImageBtn = document.getElementById("addImageBtn");
-    const readOnlyBtn = document.getElementById("readOnlyBtn");
-    const chatPanel = document.getElementById("chatPanel");
-    const chatToggleBtn = document.getElementById("chatToggleBtn");
-    const chatMessages = document.getElementById("chatMessages");
-    const chatInput = document.getElementById("chatInput");
 
     const MIN_ZOOM = 0.1;
     const MAX_ZOOM = 5;
@@ -490,12 +448,6 @@
     let layerDirty = true;
     let layerCanvas = document.createElement("canvas");
     let layerCtx = layerCanvas.getContext("2d");
-    let readOnly = false;
-    let marqueeBox = null;
-    let selectedStrokeIds = new Set();
-    let backgroundColor = "#ffffff";
-    let textColor = "#172033";
-    const imageCache = new Map();
 
     function cssWidth() {
       return canvas.clientWidth || window.innerWidth;
@@ -585,7 +537,7 @@
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.restore();
-      ctx.fillStyle = backgroundColor;
+      ctx.fillStyle = backgroundColorPicker.value;
       ctx.fillRect(0, 0, cssWidth(), cssHeight());
     }
 
@@ -652,7 +604,7 @@
     function drawStroke(targetCtx, stroke) {
       if (!stroke || !stroke.type) return;
 
-      if (stroke.type === "freehand" || stroke.type === "eraser" || stroke.type === "highlighter") {
+      if (stroke.type === "freehand" || stroke.type === "eraser") {
         drawFreehand(targetCtx, stroke);
         return;
       }
@@ -661,9 +613,6 @@
         drawStickyNote(targetCtx, stroke);
         return;
       }
-
-      if (stroke.type === "image") { drawImageStroke(targetCtx, stroke); return; }
-      if (stroke.type === "text") { drawTextStroke(targetCtx, stroke); return; }
 
       if (stroke.start && stroke.end) {
         drawShape(targetCtx, stroke);
@@ -675,10 +624,6 @@
 
       targetCtx.save();
       targetCtx.globalCompositeOperation = stroke.type === "eraser" ? "destination-out" : "source-over";
-      if (stroke.type === "highlighter") {
-        targetCtx.globalAlpha = 0.3;
-        targetCtx.globalCompositeOperation = "multiply";
-      }
       targetCtx.strokeStyle = stroke.color || "#000000";
       targetCtx.lineWidth = Math.max(1, (stroke.width || 1) * viewport.zoom);
       targetCtx.lineCap = "round";
@@ -742,38 +687,7 @@
         targetCtx.ellipse(left + width / 2, top + height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
       }
 
-      if (stroke.fillColor && stroke.type !== "line") {
-        targetCtx.fillStyle = stroke.fillColor;
-        targetCtx.fill();
-      }
-
       targetCtx.stroke();
-      targetCtx.restore();
-    }
-
-    function drawImageStroke(targetCtx, stroke) {
-      if (!stroke.data) return;
-      let image = imageCache.get(stroke.id);
-      if (!image) {
-        image = new Image();
-        image.onload = () => { markLayerDirty(); requestRedraw(); };
-        image.src = stroke.data;
-        imageCache.set(stroke.id, image);
-      }
-      if (!image.complete || !image.naturalWidth) return;
-      const point = worldToScreen(stroke.x, stroke.y);
-      targetCtx.drawImage(image, point.x, point.y, stroke.width * viewport.zoom, stroke.height * viewport.zoom);
-    }
-
-    function drawTextStroke(targetCtx, stroke) {
-      if (!stroke.text) return;
-      const point = worldToScreen(stroke.x, stroke.y);
-      const fontSize = Math.max(8, (stroke.fontSize || 24) * viewport.zoom);
-      targetCtx.save();
-      targetCtx.fillStyle = stroke.color || textColor;
-      targetCtx.font = `${fontSize}px ui-sans-serif, system-ui, sans-serif`;
-      targetCtx.textBaseline = "top";
-      String(stroke.text).split("\n").forEach((line, index) => targetCtx.fillText(line, point.x, point.y + index * fontSize * 1.35));
       targetCtx.restore();
     }
 
@@ -823,7 +737,7 @@
       const maxHeight = height - controlsHeight - padding * 1.6;
 
       targetCtx.save();
-      targetCtx.fillStyle = "rgba(23, 32, 51, 0.82)";
+      targetCtx.fillStyle = stickyTextColorPicker.value;
       targetCtx.font = Math.max(11, 15 * viewport.zoom) + "px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
       targetCtx.textBaseline = "top";
 
@@ -836,7 +750,7 @@
           targetCtx.fillText(lines[i], left, y);
         }
       } else if (note.id === selectedStrokeId) {
-        targetCtx.fillStyle = "rgba(23, 32, 51, 0.34)";
+        targetCtx.globalAlpha = 0.55;
         targetCtx.fillText("點編輯輸入文字", left, top);
       }
 
@@ -980,24 +894,6 @@
     }
 
     function drawSelectionBox() {
-      if (marqueeBox) {
-        const a = worldToScreen(marqueeBox.start.x, marqueeBox.start.y);
-        const b = worldToScreen(marqueeBox.end.x, marqueeBox.end.y);
-        ctx.save();
-        ctx.fillStyle = "rgba(15, 139, 141, 0.10)";
-        ctx.strokeStyle = "#0f8b8d";
-        ctx.setLineDash([5, 4]);
-        ctx.fillRect(a.x, a.y, b.x - a.x, b.y - a.y);
-        ctx.strokeRect(a.x, a.y, b.x - a.x, b.y - a.y);
-        ctx.restore();
-      }
-      for (const id of selectedStrokeIds) {
-        const item = findStrokeById(id), bounds = getStrokeBounds(item);
-        if (!bounds) continue;
-        const a = worldToScreen(bounds.minX, bounds.minY), b = worldToScreen(bounds.maxX, bounds.maxY);
-        ctx.save(); ctx.strokeStyle = "#0f8b8d"; ctx.setLineDash([4, 4]);
-        ctx.strokeRect(a.x - 4, a.y - 4, b.x - a.x + 8, b.y - a.y + 8); ctx.restore();
-      }
       if (activeTool !== "select" || !selectedStrokeId) return;
 
       const stroke = findStrokeById(selectedStrokeId);
@@ -1089,12 +985,11 @@
         },
         settings: {
           color: colorPicker.value,
+          backgroundColor: backgroundColorPicker.value,
+          stickyTextColor: stickyTextColorPicker.value,
           width: Number(widthSlider.value),
           stickyColor,
-          smoothStrokes,
-          backgroundColor,
-          textColor,
-          fillEnabled: fillToggle.checked
+          smoothStrokes
         },
         strokes
       };
@@ -1140,17 +1035,16 @@
         }
 
         if (data.settings) {
-          if (typeof data.settings.backgroundColor === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.backgroundColor)) {
-            backgroundColor = data.settings.backgroundColor;
-            backgroundPicker.value = backgroundColor;
-          }
-          if (typeof data.settings.textColor === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.textColor)) {
-            textColor = data.settings.textColor;
-            textColorPicker.value = textColor;
-          }
-          if (typeof data.settings.fillEnabled === "boolean") fillToggle.checked = data.settings.fillEnabled;
           if (typeof data.settings.color === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.color)) {
             colorPicker.value = data.settings.color;
+          }
+
+          if (typeof data.settings.backgroundColor === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.backgroundColor)) {
+            backgroundColorPicker.value = data.settings.backgroundColor;
+          }
+
+          if (typeof data.settings.stickyTextColor === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.stickyTextColor)) {
+            stickyTextColorPicker.value = data.settings.stickyTextColor;
           }
 
           if (Number.isFinite(data.settings.width)) {
@@ -1212,11 +1106,9 @@
       erasedStrokeIds.clear();
       currentStroke = null;
       previewShape = null;
-      marqueeBox = null;
     }
 
     function addStickyNote() {
-      if (readOnly) { showStatus("唯讀模式已啟用，無法新增便條。"); return; }
       confirmStickyEdit();
       const center = screenToWorld(cssWidth() / 2, cssHeight() / 2);
       const note = {
@@ -1231,7 +1123,6 @@
       };
 
       strokes.push(note);
-      selectedStrokeIds = new Set([note.id]);
       selectedStrokeId = note.id;
       setTool("select");
       markLayerDirty();
@@ -1338,6 +1229,7 @@
       stickyEditor.style.width = Math.max(48, width - padding * 2) + "px";
       stickyEditor.style.height = Math.max(32, height - topOffset - padding) + "px";
       stickyEditor.style.backgroundColor = note.color || "#fef08a";
+      stickyEditor.style.color = stickyTextColorPicker.value;
       stickyEditor.style.fontSize = Math.max(11, 15 * viewport.zoom) + "px";
     }
 
@@ -1400,42 +1292,33 @@
 
       const hit = findStrokeAt(world);
       if (!hit) {
-        if (!event.shiftKey) selectedStrokeIds.clear();
         selectedStrokeId = null;
-        selectionOriginalStroke = [];
+        selectionOriginalStroke = null;
         updateUndoButton();
         markLayerDirty();
         requestRedraw();
         return;
       }
 
-      if (event.shiftKey) {
-        if (selectedStrokeIds.has(hit.stroke.id)) selectedStrokeIds.delete(hit.stroke.id);
-        else selectedStrokeIds.add(hit.stroke.id);
-      } else if (!selectedStrokeIds.has(hit.stroke.id)) {
-        selectedStrokeIds = new Set([hit.stroke.id]);
-      }
-      selectedStrokeId = Array.from(selectedStrokeIds)[0] || null;
-      selectionOriginalStroke = Array.from(selectedStrokeIds, (id) => cloneStroke(findStrokeById(id))).filter(Boolean);
+      selectedStrokeId = hit.stroke.id;
+      selectionOriginalStroke = cloneStroke(hit.stroke);
       updateUndoButton();
       markLayerDirty();
       requestRedraw();
     }
 
     function continueSelection(world, pointerId) {
-      if (selectionPointerId !== pointerId || !selectedStrokeIds.size || !selectionOriginalStroke || !selectionStartWorld) return;
+      if (selectionPointerId !== pointerId || !selectedStrokeId || !selectionOriginalStroke || !selectionStartWorld) return;
 
       const deltaX = world.x - selectionStartWorld.x;
       const deltaY = world.y - selectionStartWorld.y;
       const moved = Math.hypot(deltaX, deltaY) >= MIN_POINT_DISTANCE / viewport.zoom;
       if (!moved && !selectionMoved) return;
 
-      for (const original of selectionOriginalStroke) {
-        const movedStroke = cloneStroke(original);
-        translateStroke(movedStroke, deltaX, deltaY);
-        replaceStrokeById(original.id, movedStroke);
-      }
-      if (selectionOriginalStroke.length) {
+      const movedStroke = cloneStroke(selectionOriginalStroke);
+      translateStroke(movedStroke, deltaX, deltaY);
+
+      if (replaceStrokeById(selectedStrokeId, movedStroke)) {
         selectionMoved = true;
         markLayerDirty();
         requestRedraw();
@@ -1445,12 +1328,13 @@
     function endSelection(event) {
       if (selectionPointerId !== event.pointerId) return;
 
-      const finalStrokes = selectionOriginalStroke && selectionOriginalStroke.map((stroke) => findStrokeById(stroke.id)).filter(Boolean);
-      if (selectionMoved && selectionOriginalStroke && finalStrokes.length) {
+      const finalStroke = selectedStrokeId ? findStrokeById(selectedStrokeId) : null;
+      if (selectionMoved && selectionOriginalStroke && finalStroke) {
         pushUndoAction({
-          type: "groupMove",
+          type: "move",
+          strokeId: selectedStrokeId,
           before: selectionOriginalStroke,
-          after: finalStrokes.map(cloneStroke)
+          after: cloneStroke(finalStroke)
         });
         scheduleAutosave();
       }
@@ -1469,7 +1353,7 @@
 
     function updateUndoButton() {
       undoBtn.disabled = undoStack.length === 0;
-      deleteSelectedBtn.disabled = !selectedStrokeIds.size && !selectedStrokeId;
+      deleteSelectedBtn.disabled = !selectedStrokeId;
     }
 
     function findStrokeById(id) {
@@ -1513,17 +1397,10 @@
         stroke.x += deltaX;
         stroke.y += deltaY;
       }
-      if (stroke.type === "image" || stroke.type === "text") { stroke.x += deltaX; stroke.y += deltaY; }
     }
 
     function getStrokeBounds(stroke) {
       if (!stroke) return null;
-
-      if (stroke.type === "image") return { minX: stroke.x, minY: stroke.y, maxX: stroke.x + stroke.width, maxY: stroke.y + stroke.height };
-      if (stroke.type === "text") {
-        const lines = String(stroke.text || "").split("\n");
-        return { minX: stroke.x, minY: stroke.y, maxX: stroke.x + Math.max(24, ...lines.map((line) => Array.from(line).length * (stroke.fontSize || 24) * 0.62)), maxY: stroke.y + lines.length * (stroke.fontSize || 24) * 1.35 };
-      }
 
       if (stroke.type === "sticky" && isValidStickyNote(stroke)) {
         return {
@@ -1601,7 +1478,6 @@
     }
 
     function undoLastAction() {
-      if (readOnly) { showStatus("唯讀模式已啟用。"); return; }
       const action = undoStack.pop();
       if (!action) {
         showStatus("沒有可以返回的動作。");
@@ -1621,11 +1497,6 @@
       } else if (action.type === "move" || action.type === "update") {
         replaceStrokeById(action.strokeId, cloneStroke(action.before));
         selectedStrokeId = action.strokeId;
-        selectedStrokeIds = new Set([action.strokeId]);
-      } else if (action.type === "groupMove") {
-        for (const stroke of action.before) replaceStrokeById(stroke.id, cloneStroke(stroke));
-      } else if (action.type === "groupDelete") {
-        for (const item of action.items) strokes.splice(clamp(item.index, 0, strokes.length), 0, cloneStroke(item.stroke));
       } else if (action.type === "clear") {
         strokes = action.strokes.map(cloneStroke);
         selectedStrokeId = null;
@@ -1646,20 +1517,20 @@
     }
 
     function deleteSelectedStroke() {
-      if (readOnly) { showStatus("唯讀模式已啟用。"); return; }
-      const ids = selectedStrokeIds.size ? Array.from(selectedStrokeIds) : (selectedStrokeId ? [selectedStrokeId] : []);
-      if (!ids.length) {
+      if (!selectedStrokeId) {
         showStatus("尚未選取任何物件。");
         return;
       }
 
-      const items = ids.map((id) => ({ index: findStrokeIndexById(id), stroke: findStrokeById(id) })).filter((item) => item.index >= 0).sort((a, b) => a.index - b.index);
-      if (items.length === 1) { deleteStrokeAtIndex(items[0].index, "已刪除所選物件。"); return; }
-      for (const item of [...items].reverse()) strokes.splice(item.index, 1);
-      pushUndoAction({ type: "groupDelete", items });
-      selectedStrokeIds.clear(); selectedStrokeId = null;
-      markLayerDirty(); requestRedraw(); updateUndoButton(); scheduleAutosave();
-      showStatus(`已刪除 ${items.length} 個物件。`);
+      const index = findStrokeIndexById(selectedStrokeId);
+      if (index < 0) {
+        selectedStrokeId = null;
+        updateUndoButton();
+        requestRedraw();
+        return;
+      }
+
+      deleteStrokeAtIndex(index, "已刪除所選物件。");
     }
 
     function deleteStrokeAtIndex(index, message) {
@@ -1674,7 +1545,6 @@
       }
 
       strokes.splice(index, 1);
-      selectedStrokeIds.delete(removed.id);
       pushUndoAction({
         type: "delete",
         stroke: removed,
@@ -1746,41 +1616,25 @@
       if (stroke.type === "freehand") {
         return isPointNearPolyline(world, stroke.points || [], tolerance);
       }
-      if (stroke.type === "highlighter") return isPointNearPolyline(world, stroke.points || [], tolerance);
 
       if (stroke.type === "line") {
         return distanceToSegment(world, stroke.start, stroke.end) <= tolerance;
       }
 
       if (stroke.type === "rect") {
-        if (stroke.fillColor && world.x >= Math.min(stroke.start.x, stroke.end.x) && world.x <= Math.max(stroke.start.x, stroke.end.x) && world.y >= Math.min(stroke.start.y, stroke.end.y) && world.y <= Math.max(stroke.start.y, stroke.end.y)) return true;
         return isPointNearRect(world, stroke.start, stroke.end, tolerance);
       }
 
       if (stroke.type === "circle") {
-        if (stroke.fillColor) {
-          const side = Math.min(Math.abs(stroke.end.x - stroke.start.x), Math.abs(stroke.end.y - stroke.start.y));
-          const center = { x: stroke.start.x + Math.sign(stroke.end.x - stroke.start.x || 1) * side / 2, y: stroke.start.y + Math.sign(stroke.end.y - stroke.start.y || 1) * side / 2 };
-          if (distance(world, center) <= side / 2) return true;
-        }
         return isPointNearCircle(world, stroke.start, stroke.end, tolerance);
       }
 
       if (stroke.type === "ellipse") {
-        if (stroke.fillColor) {
-          const rx = Math.abs(stroke.end.x - stroke.start.x) / 2, ry = Math.abs(stroke.end.y - stroke.start.y) / 2;
-          if (rx && ry && ((world.x - (stroke.start.x + stroke.end.x) / 2) / rx) ** 2 + ((world.y - (stroke.start.y + stroke.end.y) / 2) / ry) ** 2 <= 1) return true;
-        }
         return isPointNearEllipse(world, stroke.start, stroke.end, tolerance);
       }
 
       if (stroke.type === "sticky") {
         return isPointInStickyNote(world, stroke);
-      }
-
-      if (stroke.type === "image" || stroke.type === "text") {
-        const bounds = getStrokeBounds(stroke);
-        return bounds && world.x >= bounds.minX && world.x <= bounds.maxX && world.y >= bounds.minY && world.y <= bounds.maxY;
       }
 
       return false;
@@ -1878,7 +1732,6 @@
     }
 
     function beginDrawing(event) {
-      if (readOnly) { showStatus("唯讀模式已啟用，無法編輯白板。"); return; }
       confirmStickyEdit();
       const point = getCanvasPoint(event);
       const world = screenToWorld(point.x, point.y);
@@ -1896,24 +1749,12 @@
         return;
       }
 
-      if (activeTool === "marquee") { marqueeBox = { start: world, end: world }; requestRedraw(); return; }
-
-      if (activeTool === "text") {
-        const value = prompt("輸入文字：");
-        if (value && value.trim()) {
-          const fontSize = Number(widthSlider.value) * 4;
-          commitStroke({ id: newId("text"), type: "text", x: world.x, y: world.y, text: value, color: textColor, fontSize });
-          markLayerDirty(); requestRedraw();
-        }
-        return;
-      }
-
-      if (activeTool === "pen" || activeTool === "eraser" || activeTool === "highlighter") {
+      if (activeTool === "pen" || activeTool === "eraser") {
         currentStroke = {
           id: newId("stroke"),
-          type: activeTool === "pen" ? "freehand" : activeTool === "eraser" ? "eraser" : "highlighter",
+          type: activeTool === "pen" ? "freehand" : "eraser",
           color: colorPicker.value,
-          width: activeTool === "highlighter" ? Math.max(12, Number(widthSlider.value) * 3) : Number(widthSlider.value),
+          width: Number(widthSlider.value),
           points: [world]
         };
         requestRedraw();
@@ -1926,7 +1767,6 @@
           type: activeTool,
           color: colorPicker.value,
           width: Number(widthSlider.value),
-          fillColor: fillToggle.checked ? colorPicker.value : null,
           start: world,
           end: world
         };
@@ -1973,7 +1813,6 @@
         previewShape.end = world;
         requestRedraw();
       }
-      if (marqueeBox) { marqueeBox.end = world; requestRedraw(); }
     }
 
     function endDrawing(event) {
@@ -1986,17 +1825,6 @@
       if (activeTool === "select") {
         endSelection(event);
         return;
-      }
-
-      if (marqueeBox) {
-        const left = Math.min(marqueeBox.start.x, marqueeBox.end.x), right = Math.max(marqueeBox.start.x, marqueeBox.end.x);
-        const top = Math.min(marqueeBox.start.y, marqueeBox.end.y), bottom = Math.max(marqueeBox.start.y, marqueeBox.end.y);
-        selectedStrokeIds = new Set(strokes.filter((stroke) => {
-          const bounds = getStrokeBounds(stroke);
-          return bounds && bounds.minX <= right && bounds.maxX >= left && bounds.minY <= bottom && bounds.maxY >= top;
-        }).map((stroke) => stroke.id));
-        selectedStrokeId = Array.from(selectedStrokeIds)[0] || null;
-        marqueeBox = null; drawingPointerId = null; updateUndoButton(); markLayerDirty(); requestRedraw(); return;
       }
 
       if (drawingPointerId !== event.pointerId) return;
@@ -2111,12 +1939,6 @@
       canvas.setPointerCapture(event.pointerId);
       updateActivePointer(event);
 
-      if (readOnly && activeTool !== "pan" && event.button !== 1 && event.button !== 2 && !isSpacePressed) {
-        activePointers.delete(event.pointerId);
-        showStatus("唯讀模式已啟用。可平移與縮放白板。");
-        return;
-      }
-
       if (activePointers.size === 2) {
         beginPinch();
         return;
@@ -2200,7 +2022,6 @@
     toolbar.addEventListener("click", (event) => {
       const button = event.target.closest("[data-tool]");
       if (button) {
-        if (readOnly && !["pan"].includes(button.dataset.tool)) { showStatus("請先關閉唯讀模式再切換編輯工具。"); return; }
         setTool(button.dataset.tool);
       }
 
@@ -2224,6 +2045,16 @@
       scheduleAutosave();
     });
 
+    backgroundColorPicker.addEventListener("input", () => {
+      requestRedraw();
+      scheduleAutosave();
+    });
+
+    stickyTextColorPicker.addEventListener("input", () => {
+      requestRedraw();
+      scheduleAutosave();
+    });
+
     widthSlider.addEventListener("input", () => {
       widthValue.textContent = widthSlider.value + "px";
       scheduleAutosave();
@@ -2243,72 +2074,6 @@
     undoBtn.addEventListener("click", undoLastAction);
     deleteSelectedBtn.addEventListener("click", deleteSelectedStroke);
 
-    backgroundPicker.addEventListener("input", () => {
-      backgroundColor = backgroundPicker.value;
-      canvas.style.setProperty("--board-background", backgroundColor);
-      requestRedraw(); scheduleAutosave();
-    });
-    textColorPicker.addEventListener("input", () => { textColor = textColorPicker.value; scheduleAutosave(); });
-    fillToggle.addEventListener("change", scheduleAutosave);
-
-    readOnlyBtn.addEventListener("click", () => {
-      readOnly = !readOnly;
-      readOnlyBtn.classList.toggle("active", readOnly);
-      readOnlyBtn.setAttribute("aria-pressed", String(readOnly));
-      showStatus(readOnly ? "唯讀模式已開啟。" : "唯讀模式已關閉。");
-    });
-
-    addImageBtn.addEventListener("click", () => { if (!readOnly) imageInput.click(); });
-    imageInput.addEventListener("change", () => {
-      const file = imageInput.files && imageInput.files[0];
-      insertImageFile(file);
-      imageInput.value = "";
-    });
-
-    function insertImageFile(file) {
-      if (readOnly || !file || !file.type.startsWith("image/")) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const image = new Image();
-        image.onload = () => {
-          const scale = Math.min(1, 560 / Math.max(image.naturalWidth, image.naturalHeight));
-          const width = Math.max(1, image.naturalWidth * scale), height = Math.max(1, image.naturalHeight * scale);
-          const bitmap = document.createElement("canvas");
-          bitmap.width = Math.round(width); bitmap.height = Math.round(height);
-          bitmap.getContext("2d").drawImage(image, 0, 0, bitmap.width, bitmap.height);
-          const data = bitmap.toDataURL(file.type === "image/png" ? "image/png" : "image/jpeg", 0.88);
-          const center = screenToWorld(cssWidth() / 2, cssHeight() / 2);
-          const item = { id: newId("image"), type: "image", data, x: center.x - width / 2, y: center.y - height / 2, width, height };
-          commitStroke(item); markLayerDirty(); requestRedraw(); showStatus("圖片已加入白板。");
-        };
-        image.src = String(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    document.addEventListener("paste", (event) => {
-      const file = Array.from(event.clipboardData?.items || []).map((item) => item.getAsFile()).find((item) => item && item.type.startsWith("image/"));
-      if (file) { event.preventDefault(); insertImageFile(file); }
-    });
-
-    chatToggleBtn.addEventListener("click", () => {
-      const open = !chatPanel.classList.contains("open");
-      chatPanel.classList.toggle("open", open);
-      chatPanel.setAttribute("aria-hidden", String(!open));
-      chatToggleBtn.setAttribute("aria-expanded", String(open));
-      if (open) chatInput.focus();
-    });
-    document.getElementById("chatCloseBtn").addEventListener("click", () => {
-      chatPanel.classList.remove("open"); chatPanel.setAttribute("aria-hidden", "true"); chatToggleBtn.setAttribute("aria-expanded", "false");
-    });
-    document.getElementById("chatForm").addEventListener("submit", (event) => {
-      event.preventDefault();
-      const value = chatInput.value.trim(); if (!value) return;
-      const userLine = document.createElement("p"); userLine.textContent = `你：${value}`; chatMessages.append(userLine);
-      const response = document.createElement("p"); response.textContent = "AI 尚未連線，訊息只留在此對話框，白板內容不會被讀取。"; chatMessages.append(response);
-      chatInput.value = ""; chatMessages.scrollTop = chatMessages.scrollHeight;
-    });
-
     stickyEditor.addEventListener("keydown", (event) => {
       if ((event.metaKey || event.ctrlKey) && event.code === "Enter") {
         event.preventDefault();
@@ -2317,7 +2082,6 @@
     });
 
     clearBtn.addEventListener("click", () => {
-      if (readOnly) { showStatus("唯讀模式已啟用。"); return; }
       if (confirm("確定要清除整個白板嗎？")) {
         if (strokes.length > 0) {
           pushUndoAction({
@@ -2327,7 +2091,6 @@
         }
         strokes = [];
         selectedStrokeId = null;
-        selectedStrokeIds.clear();
         editingStickyId = null;
         editingStickyOriginal = null;
         stickyEditor.value = "";
@@ -2365,7 +2128,6 @@
     exportJsonBtn.addEventListener("click", exportJSON);
 
     importJsonBtn.addEventListener("click", () => {
-      if (readOnly) { showStatus("請先關閉唯讀模式再匯入白板。"); return; }
       importJsonInput.value = "";
       importJsonInput.click();
     });
@@ -2432,11 +2194,14 @@
       const data = {
         version: "1.0",
         createdAt: new Date().toISOString(),
-        settings: { backgroundColor, textColor, fillEnabled: fillToggle.checked, smoothStrokes },
         viewport: {
           x: viewport.x,
           y: viewport.y,
           zoom: viewport.zoom
+        },
+        settings: {
+          backgroundColor: backgroundColorPicker.value,
+          stickyTextColor: stickyTextColorPicker.value
         },
         strokes
       };
@@ -2464,13 +2229,6 @@
       undoStack = [];
       redoStack = [];
       selectedStrokeId = null;
-      selectedStrokeIds.clear();
-      if (data.settings) {
-        if (typeof data.settings.backgroundColor === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.backgroundColor)) backgroundColor = backgroundPicker.value = data.settings.backgroundColor;
-        if (typeof data.settings.textColor === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.textColor)) textColor = textColorPicker.value = data.settings.textColor;
-        if (typeof data.settings.fillEnabled === "boolean") fillToggle.checked = data.settings.fillEnabled;
-        if (typeof data.settings.smoothStrokes === "boolean") smoothStrokes = data.settings.smoothStrokes;
-      }
       editingStickyId = null;
       editingStickyOriginal = null;
       stickyEditor.value = "";
@@ -2483,10 +2241,16 @@
         viewport.zoom = clamp(data.viewport.zoom, MIN_ZOOM, MAX_ZOOM);
       }
 
+      if (data.settings) {
+        if (typeof data.settings.backgroundColor === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.backgroundColor)) {
+          backgroundColorPicker.value = data.settings.backgroundColor;
+        }
+        if (typeof data.settings.stickyTextColor === "string" && /^#[0-9a-f]{6}$/i.test(data.settings.stickyTextColor)) {
+          stickyTextColorPicker.value = data.settings.stickyTextColor;
+        }
+      }
+
       cancelDrawing();
-      canvas.style.setProperty("--board-background", backgroundColor);
-      smoothToggleBtn.classList.toggle("active", smoothStrokes);
-      smoothToggleBtn.setAttribute("aria-pressed", String(smoothStrokes));
       markLayerDirty();
       requestRedraw();
       scheduleAutosave();
@@ -2499,12 +2263,9 @@
     function isValidStroke(stroke) {
       if (!stroke || typeof stroke.type !== "string") return false;
 
-      if (stroke.type === "freehand" || stroke.type === "eraser" || stroke.type === "highlighter") {
+      if (stroke.type === "freehand" || stroke.type === "eraser") {
         return Array.isArray(stroke.points) && stroke.points.every(isValidPoint);
       }
-
-      if (stroke.type === "text") return Number.isFinite(stroke.x) && Number.isFinite(stroke.y) && typeof stroke.text === "string";
-      if (stroke.type === "image") return Number.isFinite(stroke.x) && Number.isFinite(stroke.y) && Number.isFinite(stroke.width) && Number.isFinite(stroke.height) && stroke.width > 0 && stroke.height > 0 && typeof stroke.data === "string" && stroke.data.startsWith("data:image/");
 
       if (SHAPE_TOOLS.has(stroke.type)) {
         return isValidPoint(stroke.start) && isValidPoint(stroke.end);
